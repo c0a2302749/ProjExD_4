@@ -298,6 +298,34 @@ class EMP:
 
 
 
+###################################        
+class Gravity(pg.sprite.Sprite):
+    def __init__(self, life):
+        self.life=life
+        self.image = pg.Surface((WIDTH, HEIGHT))
+        pg.draw.rect(self.image, 0, (0, 0, WIDTH, HEIGHT))
+        self.imagey.set_alpha(220)
+
+    def update(self):
+        self.life-=1
+        if self.life<0:
+            self.kill()
+
+
+###################################        
+class Gravity(pg.sprite.Sprite):
+    def __init__(self, life):
+        self.life=life
+        self.image = pg.Surface((WIDTH, HEIGHT))
+        pg.draw.rect(self.image, 0, (0, 0, WIDTH, HEIGHT))
+        self.imagey.set_alpha(220)
+
+    def update(self):
+        self.life-=1
+        if self.life<0:
+            self.kill()
+
+
 
 class Score:
     """
@@ -330,6 +358,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    gravitys = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
@@ -340,6 +369,10 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_m and score.value>=10:############
+                gravitys.add(Gravity(400))
+                score.value-=5
+
             if event.type == pg.KEYDOWN and event.key == pg.K_e and score.value >= 20:
                 EMP(emys,bombs,screen)
                 score.value-=20
@@ -358,7 +391,6 @@ def main():
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
             emys.add(Enemy())
-
         for emy in emys:
             if emy.state == "stop" and tmr%emy.interval == 0:
                 # 敵機が停止状態に入ったら，intervalに応じて爆弾投下
@@ -376,6 +408,14 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.value += 1  # 1点アップ
 
+        for emy in pg.sprite.groupcollide(emys, gravitys, True, True).keys():########
+            exps.add(Explosion(emy, 100))
+            emy.kill()
+
+        for bomb in pg.sprite.groupcollide(bombs, beams, True, True).keys():########
+            exps.add(Explosion(bomb, 50))
+            bomb.kill()
+        
         # for bomb in len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
         for bomb in pg.sprite.spritecollide(bird, bombs, True):
             if bomb.state == "inactive":
@@ -411,7 +451,6 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
 
 if __name__ == "__main__":
     pg.init()
