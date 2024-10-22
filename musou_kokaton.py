@@ -98,17 +98,67 @@ class Bird(pg.sprite.Sprite):
             self.image = pg.transform.laplacian(self.image)
             __class__.hyper_life -= 1
         sum_mv = [0, 0]
-        for k, mv in __class__.delta.items():
-            if key_lst[k]:
-                sum_mv[0] += mv[0]
-                sum_mv[1] += mv[1]
-        self.rect.move_ip(self.speed*sum_mv[0], self.speed*sum_mv[1])
-        if check_bound(self.rect) != (True, True):
-            self.rect.move_ip(-self.speed*sum_mv[0], -self.speed*sum_mv[1])
-        if not (sum_mv[0] == 0 and sum_mv[1] == 0):
-            self.dire = tuple(sum_mv)
-            self.image = self.imgs[self.dire]
-        screen.blit(self.image, self.rect)
+        current_speed= self.speed
+        if key_lst[pg.K_LSHIFT]:
+            self.speed= 20
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    sum_mv[0] += mv[0]
+                    sum_mv[1] += mv[1]
+            self.rect.move_ip(current_speed*sum_mv[0], current_speed*sum_mv[1])
+            if check_bound(self.rect) != (True, True):
+                self.rect.move_ip(-current_speed*sum_mv[0], -current_speed*sum_mv[1])
+            if not (sum_mv[0] == 0 and sum_mv[1] == 0):
+                self.dire = tuple(sum_mv)
+                self.image = self.imgs[self.dire]
+            screen.blit(self.image, self.rect)
+        else:
+            self.speed= 10
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    sum_mv[0] += mv[0]
+                    sum_mv[1] += mv[1]
+            self.rect.move_ip(current_speed*sum_mv[0], current_speed*sum_mv[1])
+            if check_bound(self.rect) != (True, True):
+                self.rect.move_ip(-current_speed*sum_mv[0], -current_speed*sum_mv[1])
+            if not (sum_mv[0] == 0 and sum_mv[1] == 0):
+                self.dire = tuple(sum_mv)
+                self.image = self.imgs[self.dire]
+            screen.blit(self.image, self.rect)
+            
+
+class Shield(pg.sprite.Sprite):
+    """
+    防御壁に関するクラス
+    """
+    def __init__(self, bird: Bird,life:int):
+        """
+        防御壁画像Surfaceを生成する
+        引数 bird：防御壁を張るこうかとん
+        引数 life：防御壁の持続時間
+        """
+        super().__init__()
+        self.life = life
+
+        self.image = pg.Surface((20, bird.rect.height * 2))
+        pg.draw.rect(self.image, (0, 0, 255), (0, 0, 20, bird.rect.height * 2))
+        self.vx,self.vy= bird.dire
+        angle = math.degrees(math.atan2(-self.vy, self.vx))
+        
+        self.image = pg.transform.rotozoom(self.image, angle, 1.0)
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.centery = bird.rect.centery + bird.rect.height * self.vy
+        self.rect.centerx = bird.rect.centerx + bird.rect.width * self.vx
+
+
+    def update(self):
+        """
+        引数 screen：画面Surface
+        """
+        self.life -= 1
+        if self.life < 0:
+            self.kill()
 
 class Shield(pg.sprite.Sprite):
     """
