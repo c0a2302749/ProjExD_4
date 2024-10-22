@@ -47,8 +47,6 @@ class Bird(pg.sprite.Sprite):
         pg.K_LEFT: (-1, 0),
         pg.K_RIGHT: (+1, 0),
     }
-    state= "normal"
-    hyper_life=0
     state = "normal"
     hyper_life = 0
 
@@ -447,7 +445,7 @@ def main():
                     score.value -= 50
                 
                 beams.add(Beam(bird))       
-            if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT and score.value > 100:
+            if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT and score.value > 10:
                 Bird.state = "hyper"
                 Bird.hyper_life = 500
                 score.value-=100
@@ -456,10 +454,6 @@ def main():
                 neo_beam = NeoBeam(bird, 5)
                 for beam in neo_beam.gen_beams():
                     beams.add(beam)
-            if event.type == pg.KEYDOWN and event.key == pg.K_o:
-                bird.hyper_life = 100
-                bird.state = "hyper"
-                print("Hyper mode")
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -491,15 +485,11 @@ def main():
         
         # for bomb in len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
         for bomb in pg.sprite.spritecollide(bird, bombs, True):
+
+
             if bomb.state == "inactive":
                 break
-            bird.change_img(8, screen) # こうかとん悲しみエフェクト
-            score.update(screen)
-            pg.display.update()
-            time.sleep(2)
-            return
-        for bomb in pg.sprite.spritecollide(bird, bombs, True):
-            if Bird.state == "hyper":
+            elif Bird.state == "hyper":
                 exps.add(Explosion(bomb, 50))  # 爆発エフェクト
                 score.value += 1  # 1点アップ
             else:
@@ -508,6 +498,8 @@ def main():
                 pg.display.update()
                 time.sleep(2)
                 return
+
+
 
         bird.update(key_lst, screen)
         shields.update()
