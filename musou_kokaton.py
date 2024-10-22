@@ -297,7 +297,7 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
-            if event.type == pg.KEYDOWN and event.key == pg.K_z:
+            if event.type == pg.KEYDOWN and event.key == pg.K_s:
                 if score.value > 50 and len(shields) == 0:
                     shields.add(Shield(bird,100))
                     score.value -= 50
